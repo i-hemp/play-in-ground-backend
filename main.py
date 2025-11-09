@@ -20,7 +20,6 @@ app.add_middleware(
 )
 # Connect to MongoDB Atlas
 MONGO_URI = os.getenv("MONGODB_API_URI_URL")
-# MONGO_URI = "mongodb+srv://hemanthpatnam09_db_user:khUCHlnSYQZb3Yrd@cluster0.vkvrlyf.mongodb.net/?appName=Cluster0"
 client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
 
 try:
