@@ -1,0 +1,302 @@
+### PlayInGround Backend API Tests - Node.js
+### Complete test suite for all 14 endpoints
+
+@baseUrl = http://localhost:8000
+@token = YOUR_TOKEN_HERE
+@groundId = YOUR_GROUND_ID_HERE
+@bookingId = YOUR_BOOKING_ID_HERE
+@requestId = YOUR_REQUEST_ID_HERE
+
+###############################################
+# 1. AUTHENTICATION ENDPOINTS (2)
+###############################################
+
+### 1.1 Signup - Register new user
+POST {{baseUrl}}/auth/signup HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Test Player",
+  "email": "player@test.com",
+  "password": "password123",
+  "role": "player"
+}
+
+### 1.2 Signup - Register owner
+POST {{baseUrl}}/auth/signup HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Test Owner",
+  "email": "owner@test.com",
+  "password": "password123",
+  "role": "owner"
+}
+
+### 1.3 Signup - Register admin
+POST {{baseUrl}}/auth/signup HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Test Admin",
+  "email": "admin@test.com",
+  "password": "password123",
+  "role": "admin"
+}
+
+### 1.4 Login - Get JWT token
+POST {{baseUrl}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "player@test.com",
+  "password": "password123"
+}
+###
+
+GET {{baseUrl}} HTTP/1.1
+
+###
+# Copy the token from response and update @token variable above
+
+###############################################
+# 2. GROUND ENDPOINTS (4)
+###############################################
+
+### 2.1 Get All Grounds (Public)
+GET {{baseUrl}}/grounds HTTP/1.1
+
+### 2.2 Get Ground by ID (Public)
+GET {{baseUrl}}/grounds/{{groundId}} HTTP/1.1
+
+### 2.3 Get Unique Locations (Public)
+GET {{baseUrl}}/grounds/locations HTTP/1.1
+
+### 2.4 Create Ground (Owner/Admin only)
+POST {{baseUrl}}/grounds HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Cricket Ground A",
+  "place": "Downtown",
+  "image_url": "https://example.com/ground.jpg",
+  "price_per_hour": 500,
+  "description": "Professional cricket ground with all facilities",
+  "map_url": "https://maps.google.com/?q=downtown+cricket"
+}
+
+###############################################
+# 3. BOOKING ENDPOINTS (4)
+###############################################
+
+### 3.1 Create Booking (Authenticated)
+POST {{baseUrl}}/bookings HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "ground_id": "{{groundId}}",
+  "booking_date": "2026-02-16",
+  "start_time": "09:00",
+  "duration_hours": 2
+}
+
+### 3.2 Get My Bookings (Authenticated)
+GET {{baseUrl}}/bookings/my-bookings HTTP/1.1
+Authorization: Bearer {{token}}
+
+### 3.3 Get Booking by ID (Authenticated)
+GET {{baseUrl}}/bookings/{{bookingId}} HTTP/1.1
+Authorization: Bearer {{token}}
+
+### 3.4 Cancel Booking (Authenticated)
+DELETE {{baseUrl}}/bookings/{{bookingId}} HTTP/1.1
+Authorization: Bearer {{token}}
+
+###############################################
+# 4. AVAILABILITY ENDPOINTS (4)
+###############################################
+
+### 4.1 Get Ground Availability (Public)
+GET {{baseUrl}}/grounds/{{groundId}}/availability HTTP/1.1
+
+### 4.2 Set Availability (Owner/Admin only)
+POST {{baseUrl}}/grounds/{{groundId}}/availability HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "day_of_week": 1,
+  "is_available": true
+}
+
+### 4.3 Block Date (Owner/Admin only)
+POST {{baseUrl}}/grounds/{{groundId}}/block-date HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "blocked_date": "2026-02-20",
+  "reason": "Maintenance work scheduled"
+}
+
+### 4.4 Request Hours Change (Owner only)
+POST {{baseUrl}}/grounds/{{groundId}}/request-hours-change HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "requested_opening": "05:00",
+  "requested_closing": "23:00",
+  "reason": "High demand from customers for early morning and late night slots"
+}
+
+###############################################
+# 5. ADMIN ENDPOINTS (3)
+###############################################
+
+### 5.1 Get Pending Requests (Admin only)
+GET {{baseUrl}}/admin/schedule-requests HTTP/1.1
+Authorization: Bearer {{token}}
+
+### 5.2 Approve Request (Admin only)
+PUT {{baseUrl}}/admin/schedule-requests/{{requestId}}/approve HTTP/1.1
+Authorization: Bearer {{token}}
+
+### 5.3 Reject Request (Admin only)
+PUT {{baseUrl}}/admin/schedule-requests/{{requestId}}/reject HTTP/1.1
+Authorization: Bearer {{token}}
+
+###############################################
+# 6. HEALTH CHECK
+###############################################
+
+### 6.1 Root endpoint - API info
+GET {{baseUrl}}/ HTTP/1.1
+
+###############################################
+# TESTING WORKFLOW
+###############################################
+
+# Step 1: Start the server
+# npm start
+
+# Step 2: Test root endpoint (6.1)
+
+# Step 3: Create users (1.1, 1.2, 1.3)
+# - Create player account
+# - Create owner account  
+# - Create admin account
+
+# Step 4: Login (1.4)
+# - Login with player account
+# - Copy token from response
+# - Update @token variable
+
+# Step 5: Test ground endpoints (2.1-2.4)
+# - Get all grounds
+# - Copy a ground ID
+# - Update @groundId variable
+# - Create new ground (as owner)
+
+# Step 6: Test booking endpoints (3.1-3.4)
+# - Create booking
+# - Copy booking ID
+# - Update @bookingId variable
+# - Get my bookings
+# - Get booking by ID
+# - Cancel booking
+
+# Step 7: Test availability endpoints (4.1-4.4)
+# - Get availability
+# - Set availability (as owner)
+# - Block date (as owner)
+# - Request hours change (as owner)
+
+# Step 8: Test admin endpoints (5.1-5.3)
+# - Login as admin
+# - Update @token with admin token
+# - Get pending requests
+# - Copy request ID
+# - Update @requestId variable
+# - Approve or reject request
+
+###############################################
+# EXPECTED RESPONSES
+###############################################
+
+# Success responses:
+# - 200 OK - Successful GET/PUT/DELETE
+# - 201 Created - Successful POST (creation)
+
+# Error responses:
+# - 400 Bad Request - Invalid input
+# - 401 Unauthorized - Missing/invalid token
+# - 403 Forbidden - Insufficient permissions
+# - 404 Not Found - Resource not found
+# - 500 Internal Server Error - Server error
+
+###############################################
+# IDEMPOTENCY TEST
+###############################################
+
+### Test: Create same booking twice (should return existing)
+POST {{baseUrl}}/bookings HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "ground_id": "{{groundId}}",
+  "booking_date": "2026-02-16",
+  "start_time": "09:00",
+  "duration_hours": 2
+}
+
+# Run this twice - second time should return existing booking
+
+###############################################
+# VALIDATION TESTS
+###############################################
+
+### Test: Invalid duration (should fail)
+POST {{baseUrl}}/bookings HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "ground_id": "{{groundId}}",
+  "booking_date": "2026-02-16",
+  "start_time": "09:00",
+  "duration_hours": 6
+}
+
+### Test: Booking too far ahead (should fail)
+POST {{baseUrl}}/bookings HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "ground_id": "{{groundId}}",
+  "booking_date": "2026-02-25",
+  "start_time": "09:00",
+  "duration_hours": 2
+}
+
+### Test: Missing authorization (should fail)
+GET {{baseUrl}}/bookings/my-bookings HTTP/1.1
+
+### Test: Invalid role access (should fail)
+# Login as player, try to create ground
+POST {{baseUrl}}/grounds HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Test Ground",
+  "place": "Test Place",
+  "image_url": "https://example.com/test.jpg",
+  "price_per_hour": 100,
+  "description": "Test",
+  "map_url": "https://maps.google.com"
+}
